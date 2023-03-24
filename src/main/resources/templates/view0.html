@@ -29,6 +29,7 @@
           </td>
         </tr>
         <tr data-th-if="${#fields.hasErrors('username')}">
+          <td></td>
           <td>
             <span
               data-th-errorclass="error"
@@ -52,6 +53,7 @@
           </td>
         </tr>
         <tr data-th-if="${#fields.hasErrors('password')}">
+          <td></td>
           <td>
             <span
               data-th-errorclass="error"
@@ -59,6 +61,20 @@
             ></span>
           </td>
         </tr>
+        <div data-th-if="${user.failedLogInAttempts gt 0}">
+          <tr>
+            <td>
+              What is <span data-th-text="${randnum1}"></span> +
+              <span data-th-text="${randnum2}"></span>?
+            </td>
+          </tr>
+          <tr>
+            <td>Answer:</td>
+            <td>
+              <input type="number" size="30" placeholder="Answer" required />
+            </td>
+          </tr>
+        </div>
         <tr>
           <td></td>
           <td>

@@ -11,7 +11,6 @@ import jakarta.validation.constraints.Size;
 public class User implements Serializable {
     
     private static final long serialVersionUID = 1L;
-    private static final long MAX_ALLOWABLE_LOG_IN_ATTEMPTS = 3L;
 
     @Size(min=2, message="Username must be at least 2 characters in length")
     private String username;

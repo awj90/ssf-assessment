@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import ibf2022.batch2.ssf.frontcontroller.models.User;
 import ibf2022.batch2.ssf.frontcontroller.services.AuthenticationService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -42,7 +41,7 @@ public class FrontController {
 			success = user.isAuthenticated();
 
 		} catch (Exception e) {
-			// e.printStackTrace();
+			user.incrFailedLogInAttempts();
 
 		} 
 
@@ -55,8 +54,12 @@ public class FrontController {
 			return "view1";
 		} 
 
-		FieldError err = new FieldError("user", "password", "Username and password does not match");
+		String logInFailedMessage = "Username and password do not match. Remaining log in attempts for %s: %d".formatted(user.getUsername(), AuthenticationService.getMaxAllowableLogInAttempts() - user.getFailedLogInAttempts());
+		FieldError err = new FieldError("user", "password", logInFailedMessage);
 		bindingResult.addError(err);
+		model.addAttribute("user", user);
+		model.addAttribute("randnum1", authenticationService.generateRandomNum());
+		model.addAttribute("randnum2", authenticationService.generateRandomNum());
 		return "view0";
 			
 	}

@@ -1,6 +1,7 @@
 package ibf2022.batch2.ssf.frontcontroller.services;
 
 import java.io.StringReader;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,7 @@ public class AuthenticationService {
 	AuthenticationRepository authenticationRepository;
 
 	private static final int MAX_ALLOWABLE_LOG_IN_ATTEMPTS = 3;
+	private static final int CAPTCHA_SETTING = 50;
 
 	// TODO: Task 2
 	// DO NOT CHANGE THE METHOD'S SIGNATURE
@@ -103,4 +105,14 @@ public class AuthenticationService {
 	public boolean isLocked(String username) {
 		return authenticationRepository.isDisabled(username);
 	}
+
+	public int generateRandomNum() {
+		Random random = new Random();
+		return random.nextInt(CAPTCHA_SETTING) + 1;
+	}
+
+	public static int getMaxAllowableLogInAttempts() {
+		return MAX_ALLOWABLE_LOG_IN_ATTEMPTS;
+	}
+	
 }
