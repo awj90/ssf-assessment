@@ -21,6 +21,7 @@ public class User implements Serializable {
     private int failedLogInAttempts;
     private boolean authenticated;
     private boolean locked;
+    private int captcha;
 
     public User() {}
 
@@ -61,6 +62,12 @@ public class User implements Serializable {
     public void setLocked(boolean locked) {
         this.locked = locked;
     }    
+    public int getCaptcha() {
+        return captcha;
+    }
+    public void setCaptcha(int captcha) {
+        this.captcha = captcha;
+    }
 
     public JsonObject toJsonObject() {
         return Json.createObjectBuilder()
@@ -69,6 +76,7 @@ public class User implements Serializable {
                     .add("failedLogInAttempts",String.valueOf(this.getFailedLogInAttempts()))
                     .add("authenticated", String.valueOf(this.isAuthenticated()))
                     .add("locked", String.valueOf(this.isLocked()))
+                    .add("captcha", String.valueOf(this.getCaptcha()))
                     .build();
     }
 
@@ -86,6 +94,7 @@ public class User implements Serializable {
             user.setFailedLogInAttempts(Integer.parseInt(jsonObject.getString("failedLogInAttempts")));
             user.setAuthenticated(Boolean.valueOf(jsonObject.getString("authenticated")));
             user.setLocked(Boolean.valueOf(jsonObject.getString("locked")));
+            user.setCaptcha(Integer.parseInt(jsonObject.getString("captcha")));
         }
 
         return user;

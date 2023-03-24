@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import ibf2022.batch2.ssf.frontcontroller.models.Captcha;
 import ibf2022.batch2.ssf.frontcontroller.models.User;
 import ibf2022.batch2.ssf.frontcontroller.services.AuthenticationService;
 import jakarta.validation.Valid;
@@ -24,6 +25,7 @@ public class FrontController {
 	@GetMapping(path="/")
 	public String renderLandingPage(Model model) {
 		model.addAttribute("user", new User());
+		
 		return "view0";
 	}
 	
@@ -57,11 +59,19 @@ public class FrontController {
 		String logInFailedMessage = "Username and password do not match. Remaining log in attempts for %s: %d".formatted(user.getUsername(), AuthenticationService.getMaxAllowableLogInAttempts() - user.getFailedLogInAttempts());
 		FieldError err = new FieldError("user", "password", logInFailedMessage);
 		bindingResult.addError(err);
+
 		model.addAttribute("user", user);
-		model.addAttribute("randnum1", authenticationService.generateRandomNum());
-		model.addAttribute("randnum2", authenticationService.generateRandomNum());
+		model.addAttribute("captcha", new Captcha());
 		return "view0";
 			
 	}
+
+	// @GetMapping(path="/logout")
+	// public String logout(HttpSession session) {
+	// 	User user = (User) session.getAttribute("user");
+	// 	authenticationService.logout(user);
+	// 	session.invalidate();
+	// 	return "view0";
+	// }
 
 }

@@ -1,7 +1,6 @@
 package ibf2022.batch2.ssf.frontcontroller.services;
 
 import java.io.StringReader;
-import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +26,6 @@ public class AuthenticationService {
 	AuthenticationRepository authenticationRepository;
 
 	private static final int MAX_ALLOWABLE_LOG_IN_ATTEMPTS = 3;
-	private static final int CAPTCHA_SETTING = 50;
 
 	// TODO: Task 2
 	// DO NOT CHANGE THE METHOD'S SIGNATURE
@@ -75,7 +73,7 @@ public class AuthenticationService {
 				user.setAuthenticated(true); // mark isAuthenticated as true
 				user.setFailedLogInAttempts(0); // reset failedLogInAttempts
 			} 
-			authenticationRepository.saveUsers(user);
+			saveUsers(user);
 
 		} catch (Exception e) {
 			user.setAuthenticated(false);
@@ -85,7 +83,7 @@ public class AuthenticationService {
 				user.setLocked(true);
 				user.setFailedLogInAttempts(0);
 			}
-			authenticationRepository.saveUsers(user);
+			saveUsers(user);
 			throw e;
 		}
 		
@@ -106,13 +104,20 @@ public class AuthenticationService {
 		return authenticationRepository.isDisabled(username);
 	}
 
-	public int generateRandomNum() {
-		Random random = new Random();
-		return random.nextInt(CAPTCHA_SETTING) + 1;
-	}
-
 	public static int getMaxAllowableLogInAttempts() {
 		return MAX_ALLOWABLE_LOG_IN_ATTEMPTS;
 	}
 	
+	public void saveUsers(User user) {
+		authenticationRepository.saveUsers(user);
+	}
+
+	public User getUser(String username) {
+		return authenticationRepository.getUser(username);
+	}
+
+	public void logout(User user) {
+		user.setAuthenticated(false);
+		saveUsers(user);
+	}
 }
