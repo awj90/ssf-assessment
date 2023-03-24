@@ -30,13 +30,24 @@ public class AuthenticationService {
 	// TODO: Task 2
 	// DO NOT CHANGE THE METHOD'S SIGNATURE
 	// Write the authentication method in here
-	public boolean authenticate(String username, String password) throws Exception {
-
-		if (isLocked(username)) {
-			
+	public User authenticate(String username, String password) throws Exception {
+ 
+		User user = authenticationRepository.getUser(username);
+		if (user == null) {
+			user = new User(username);
+			user.setPassword(password);
 		}
 
-		// Set up request entity and exchange for response entity
+		user.setAuthenticated(false);
+
+		// Check if user is locked 
+		if (isLocked(username)) {
+			return user;
+		} else {
+			user.setLocked(false);
+		}
+
+		// If user is not locked, set up request entity and exchange for response entity
         RequestEntity<String> req = 
                         RequestEntity.post("https://auth.chuklee.com/api/authenticate")
                                     .contentType(MediaType.APPLICATION_JSON)
@@ -50,7 +61,6 @@ public class AuthenticationService {
         RestTemplate template = new RestTemplate();
 		
 		try {
-
 			ResponseEntity<String> resp = template.exchange(req, String.class); 
 			
 			// Marshal the response body
@@ -59,24 +69,25 @@ public class AuthenticationService {
 			JsonObject jsonObject = jsonReader.readObject();
 			String message = jsonObject.getString("message");
 		
-			User user = new User(username);
-		
 			if (message.equals("Authenticated %s".formatted(username))) {			
 				user.setAuthenticated(true); // mark isAuthenticated as true
 				user.setFailedLogInAttempts(0); // reset failedLogInAttempts
-				return true;
-			} else {
-				user.incrFailedLogInAttempts(); // increment failedLogInAttempts
-				if (user.getFailedLogInAttempts() > MAX_ALLOWABLE_LOG_IN_ATTEMPTS) {
-					disableUser(username);
-				}
-				return false;
-				// redisplay view0 with error message and a captcha
-				// if failedLogInAttempts > 3, call disableUser method below
-			}
+			} 
+			authenticationRepository.saveUsers(user);
+
 		} catch (Exception e) {
+			user.setAuthenticated(false);
+			user.incrFailedLogInAttempts(); // increment failedLogInAttempts
+			if (user.getFailedLogInAttempts() > MAX_ALLOWABLE_LOG_IN_ATTEMPTS) {
+				disableUser(username);
+				user.setLocked(true);
+				user.setFailedLogInAttempts(0);
+			}
+			authenticationRepository.saveUsers(user);
 			throw e;
 		}
+		
+		return user;
 	}
 
 	// TODO: Task 3

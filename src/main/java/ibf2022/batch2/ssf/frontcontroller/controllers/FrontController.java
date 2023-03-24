@@ -23,7 +23,7 @@ public class FrontController {
 	// TODO: Task 2, Task 3, Task 4, Task 6
 	
 	@GetMapping(path="/")
-	public String renderLandingPage(Model model, HttpSession session) {
+	public String renderLandingPage(Model model) {
 		model.addAttribute("user", new User());
 		return "view0";
 	}
@@ -38,21 +38,27 @@ public class FrontController {
 		boolean success = false;
 
 		try {
-			success = authenticationService.authenticate(user.getUsername(), user.getPassword());
+			user = authenticationService.authenticate(user.getUsername(), user.getPassword());
+			success = user.isAuthenticated();
 
 		} catch (Exception e) {
 			// e.printStackTrace();
 
 		} 
 
+		if (user.isLocked()) {
+			model.addAttribute("username", user.getUsername());
+			return "view2";
+		}
+
 		if (success) {
 			return "view1";
-		} else {
-			FieldError err = new FieldError("user", "password", "Username and password does not match");
-			bindingResult.addError(err);
-			return "view0";
-		}		
-	
+		} 
+
+		FieldError err = new FieldError("user", "password", "Username and password does not match");
+		bindingResult.addError(err);
+		return "view0";
+			
 	}
 
 }
